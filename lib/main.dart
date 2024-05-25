@@ -27,8 +27,16 @@ class _myhomeState extends State<myhome> {
   var TeamTwo = '0';
   var TeamThree = '0';
   var TeamFour = '0';
-  final List<String> point = ['0', '1', '2'];
-  List<String> _assignedTeams = ['Team1','Team2','Team3','Team4'];
+  final List<String> point = ['0', '1', '2', '3', '4'];
+  List<String> _assignedTeams = ['Team.team1','Team.team2','Team.team3','Team.team4'];
+
+  List<int> playersScore = [0, 0, 0, 0];  // 현황 및 18홀 결과를 위한 4명의 점수
+  int player1 = 0;  // 타수 계산용 변수입니다.
+  int player2 = 0;
+  int player3 = 0;
+  int player4 = 0;
+  List<int> teamScore = [0, 0, 0, 0]; // 경기당 각 팀의 점수를 저장할 리스트입니다.
+  List<String> record = []; // 전체 경기의 승리 팀을 저장할 리스트입니다.
 
   void _assignTeams() {
     // 팀 분류
@@ -41,6 +49,120 @@ class _myhomeState extends State<myhome> {
     setState(() {
       _assignedTeams = assignedTeams.map((team) => team.toString()).toList();
     });
+  }
+
+  void scoreInput(){
+    // 플레이어가 들어간 팀에 따라 타수를 계산합니다.
+    // 계산된 타수는 teamScore 리스트에 들어갑니다.
+    List teamOneScore = [];
+    List teamTwoScore = [];
+    List teamThreeScore = [];
+    List teamFourScore = [];
+    for(int i = 0; i < 4; i++){
+      if(_assignedTeams[i] == 'Team.team1'){
+        teamOneScore.add(i == 0 ? player1 : i == 1 ? player2 : i == 2 ? player3 : player4);
+      }else if(_assignedTeams[i] == 'Team.team2'){
+        teamTwoScore.add(i == 0 ? player1 : i == 1 ? player2 : i == 2 ? player3 : player4);
+      }else if(_assignedTeams[i] == 'Team.team3'){
+        teamThreeScore.add(i == 0 ? player1 : i == 1 ? player2 : i == 2 ? player3 : player4);
+      }else if(_assignedTeams[i] == 'Team.team4'){
+        teamFourScore.add(i == 0 ? player1 : i == 1 ? player2 : i == 2 ? player3 : player4);
+      }
+    }
+
+    if(teamOneScore.length >= 2){ // 팀 인원이 2명 이상
+      teamOneScore.sort();
+      teamScore[0] = teamOneScore[0] + teamOneScore[1];
+    }else if(
+        teamOneScore.length == 1  // 각 팀에 한 명
+        && teamTwoScore.length == 1
+        && teamThreeScore.length == 1
+        && teamFourScore.length == 1
+    ){
+      teamScore[0] = teamOneScore[0];
+    }else if(teamOneScore.length == 1){ // 팀 인원이 1명이고 나머지 팀 중 2명 이상인 팀이 있을 때
+      teamScore[0] = teamOneScore[0] * 2;
+    }
+
+    if(teamTwoScore.length >= 2){ // 여기서 부터 아래는 위의 반복입니다.
+      teamTwoScore.sort();
+      teamScore[1] = teamTwoScore[0] + teamTwoScore[1];
+    }else if(
+    teamOneScore.length == 1
+        && teamTwoScore.length == 1
+        && teamThreeScore.length == 1
+        && teamFourScore.length == 1
+    ){
+      teamScore[1] = teamTwoScore[0];
+    }else if(teamTwoScore.length == 1){
+      teamScore[1] = teamTwoScore[0] * 2;
+    }
+
+    if(teamThreeScore.length >= 2){
+      teamThreeScore.sort();
+      teamScore[2] = teamThreeScore[0] + teamThreeScore[1];
+    }else if(
+    teamOneScore.length == 1
+        && teamTwoScore.length == 1
+        && teamThreeScore.length == 1
+        && teamFourScore.length == 1
+    ){
+      teamScore[2] = teamThreeScore[0];
+    }else if(teamThreeScore.length == 1){
+      teamScore[2] = teamThreeScore[0] * 2;
+    }
+
+    if(teamFourScore.length >= 2){
+      teamFourScore.sort();
+      teamScore[3] = teamFourScore[0] + teamFourScore[1];
+    }else if(
+    teamOneScore.length == 1
+        && teamTwoScore.length == 1
+        && teamThreeScore.length == 1
+        && teamFourScore.length == 1
+    ){
+      teamScore[3] = teamFourScore[0];
+    }else if(teamFourScore.length == 1){
+      teamScore[3] = teamFourScore[0] * 2;
+    }
+  }
+
+  String winningTeam(int one, int two, int three, int four){
+    // 각 팀의 타수로 이긴 팀 찾기
+    Map scores =
+      {
+        'team1':one,
+        'team2':two,
+        'team3':three,
+        'team4':four
+      };
+    int count = 0;
+    int min = 11; // 5홀에서 더블파로 10타가 최소 타수입니다.
+    String winningTeam = '';
+
+    for(int i = 0; i < 4; i++){
+      // 0타는 팀 분류시 플레이어가 1명도 들어가지 않은 팀입니다.
+      if(scores['team${i + 1}'] == 0){
+        continue; // 스킵
+      }
+
+      if(min > scores['team${i + 1}']){
+        min = scores['team${i + 1}'];
+        winningTeam = '팀${i == 0 ? '1' : i == 1 ? '2' : i == 2 ? '3' : '4'} 승리';
+      }
+    }
+
+    for(int i = 0; i < 4; i++){
+      if(min == scores['team${i + 1}']){
+        count++;
+      }
+    }
+
+    if(count > 1){
+      winningTeam = '비겼습니다.';
+    }
+
+    return winningTeam;
   }
 
 
@@ -74,6 +196,7 @@ class _myhomeState extends State<myhome> {
                     onChanged: (value) {
                       setState(() {
                         TeamOne = value!;
+                        player1 = int.parse(value);
                       });
                     },
                   ),
@@ -90,6 +213,7 @@ class _myhomeState extends State<myhome> {
                     onChanged: (value) {
                       setState(() {
                         TeamTwo = value!;
+                        player2 = int.parse(value);
                       });
                     },
                   ),
@@ -106,6 +230,7 @@ class _myhomeState extends State<myhome> {
                     onChanged: (value) {
                       setState(() {
                         TeamThree = value!;
+                        player3 = int.parse(value);
                       });
                     },
                   ),
@@ -122,6 +247,7 @@ class _myhomeState extends State<myhome> {
                     onChanged: (value) {
                       setState(() {
                         TeamFour = value!;
+                        player4 = int.parse(value);
                       });
                     },
                   ),
@@ -149,7 +275,12 @@ class _myhomeState extends State<myhome> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text('경기 결과'),
-                    subtitle: Text('${games[index].p1}\n${games[index].p2}\n${games[index].p3}\n${games[index].p4}\n'),
+                    subtitle: Text(
+                        '플레이어1 : ${games[index].p1}             팀1 : ${games[index].scores[0]}             결과 : ${record[index]}\n'
+                        '플레이어2 : ${games[index].p2}             팀2 : ${games[index].scores[1]}\n'
+                        '플레이어3 : ${games[index].p3}             팀3 : ${games[index].scores[2]}\n'
+                        '플레이어4 : ${games[index].p4}             팀4 : ${games[index].scores[3]}\n'
+                    ),
                   );
                 },
                 separatorBuilder: (context, index) {
@@ -168,9 +299,16 @@ class _myhomeState extends State<myhome> {
                   setState(
                         () {
                       if(games.length!=18){
-                        games.add(Game(TeamOne, TeamTwo, TeamThree, TeamFour));
+                        games.add(Game(TeamOne, TeamTwo, TeamThree, TeamFour, teamScore));
+                        playersScore[0] += int.parse(TeamOne);
+                        playersScore[1] += int.parse(TeamTwo);
+                        playersScore[2] += int.parse(TeamThree);
+                        playersScore[3] += int.parse(TeamFour);
+                        scoreInput();
+                        record.add(winningTeam(teamScore[0], teamScore[1], teamScore[2], teamScore[3]));
+                        teamScore = [0, 0, 0, 0];
                       }else{
-                        games.add(Game('','','',''));
+                        games.add(Game('','','','', []));
                       }
                     },
 
@@ -189,8 +327,9 @@ class Game {
   String p2;
   String p3;
   String p4;
+  List<int> scores = [0, 0, 0, 0];  // 게임 별로 팀 타수 저장
 
-  Game(this.p1, this.p2, this.p3, this.p4);
+  Game(this.p1, this.p2, this.p3, this.p4, this.scores);
 }
 
 List<Game> games = [];
