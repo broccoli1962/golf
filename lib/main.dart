@@ -54,10 +54,12 @@ class _myhomeState extends State<myhome> {
   void scoreInput(){
     // 플레이어가 들어간 팀에 따라 타수를 계산합니다.
     // 계산된 타수는 teamScore 리스트에 들어갑니다.
-    List teamOneScore = [];
-    List teamTwoScore = [];
-    List teamThreeScore = [];
-    List teamFourScore = [];
+    List<int> teamOneScore = [];
+    List<int> teamTwoScore = [];
+    List<int> teamThreeScore = [];
+    List<int> teamFourScore = [];
+
+    int? index = null;  // 2:1:1에서 1명인 팀 중 한개를 정해 그 팀 점수로 더함
     for(int i = 0; i < 4; i++){
       if(_assignedTeams[i] == 'Team.team1'){
         teamOneScore.add(i == 0 ? player1 : i == 1 ? player2 : i == 2 ? player3 : player4);
@@ -80,8 +82,14 @@ class _myhomeState extends State<myhome> {
         && teamFourScore.length == 1
     ){
       teamScore[0] = teamOneScore[0];
-    }else if(teamOneScore.length == 1){ // 팀 인원이 1명이고 나머지 팀 중 2명 이상인 팀이 있을 때
+    }else if(teamOneScore.length == 1 &&
+        !(teamTwoScore.length == 1
+            || teamThreeScore.length == 1
+            || teamFourScore.length == 1)){ // 팀 인원이 1명이고 나머지 팀 중 1명인 팀이 없을 때
       teamScore[0] = teamOneScore[0] * 2;
+    }else if(teamOneScore.length == 1){  // 1명인 팀 2개를 더하기 위한 코드
+      index ??= 0;
+      teamScore[index] += teamOneScore[0];
     }
 
     if(teamTwoScore.length >= 2){ // 여기서 부터 아래는 위의 반복입니다.
@@ -94,8 +102,14 @@ class _myhomeState extends State<myhome> {
         && teamFourScore.length == 1
     ){
       teamScore[1] = teamTwoScore[0];
-    }else if(teamTwoScore.length == 1){
+    }else if(teamTwoScore.length == 1 &&
+        !(teamOneScore.length == 1
+            || teamThreeScore.length == 1
+            || teamFourScore.length == 1)){
       teamScore[1] = teamTwoScore[0] * 2;
+    }else if(teamTwoScore.length == 1){
+      index ??= 1;
+      teamScore[index] += teamTwoScore[0];
     }
 
     if(teamThreeScore.length >= 2){
@@ -108,8 +122,14 @@ class _myhomeState extends State<myhome> {
         && teamFourScore.length == 1
     ){
       teamScore[2] = teamThreeScore[0];
-    }else if(teamThreeScore.length == 1){
+    }else if(teamThreeScore.length == 1 &&
+        !(teamTwoScore.length == 1
+            || teamOneScore.length == 1
+            || teamFourScore.length == 1)){
       teamScore[2] = teamThreeScore[0] * 2;
+    }else if(teamThreeScore.length == 1){
+      index ??= 2;
+      teamScore[index] += teamThreeScore[0];
     }
 
     if(teamFourScore.length >= 2){
@@ -122,8 +142,14 @@ class _myhomeState extends State<myhome> {
         && teamFourScore.length == 1
     ){
       teamScore[3] = teamFourScore[0];
-    }else if(teamFourScore.length == 1){
+    }else if(teamFourScore.length == 1 &&
+        !(teamTwoScore.length == 1
+            || teamThreeScore.length == 1
+            || teamOneScore.length == 1)){
       teamScore[3] = teamFourScore[0] * 2;
+    }else if(teamFourScore.length == 1){
+      index ??= 3;
+      teamScore[index] += teamFourScore[0];
     }
   }
 
