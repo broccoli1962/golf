@@ -7,6 +7,14 @@ class Player {
   int lose = 0;
   int draw = 0;
 
+  void reset(){
+    this.score = List.filled(19, 0);
+    this.team = List.filled(19, 0);
+    this.win = 0;
+    this.lose = 0;
+    this.draw = 0;
+  }
+
   String getName() {
     return name;
   }
