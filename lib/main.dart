@@ -87,11 +87,6 @@ class _myhomeState extends State<myhome> {
     if(teamCount[teamNumber - 1] == 3){ // 팀이 3명일 때
       teamScore.sort();
       sum = teamScore[0] + teamScore[1];
-      for(int i = 0; i<4; i++){
-        if(teamNumber != playerList[i].team[index]){
-          sum = teamScore[0]*2;
-        }
-      }
     }
 
     return sum;
@@ -178,6 +173,47 @@ class _myhomeState extends State<myhome> {
     return result;
   }
 
+  String winStatusText(int index){
+    var result = '';
+    for(int i = 0; i<4; i++) {
+      result += '${playerList[i].getName()} : ${playerList[i].getWin()}승 ${playerList[i].getLose()}패 ${playerList[i].getDraw()}무\n';
+    }
+
+    return result;
+  }
+
+  void winStatus(int index) {
+    countTeamMember(index-1);
+    String result = winningTeam(
+        calcTeamScore(1, index - 1), calcTeamScore(2, index - 1),
+        calcTeamScore(3, index - 1), calcTeamScore(4, index - 1), index - 1);
+
+    print(result);
+    print('인덱스 $index');
+    print(playerList[0].getTeam(index - 1));
+
+    for (int i = 0; i < 4; i++) {
+      if (result == '팀1 승리' && playerList[i].getTeam(index - 1) == 1) {
+        playerList[i].win += 1;
+        continue;
+      } else if (result == '팀2 승리' && playerList[i].getTeam(index - 1) == 2) {
+        playerList[i].win += 1;
+        continue;
+      } else if (result == '팀3 승리' && playerList[i].getTeam(index - 1) == 3) {
+        playerList[i].win += 1;
+        continue;
+      } else if (result == '팀4 승리' && playerList[i].getTeam(index - 1) == 4) {
+        playerList[i].win += 1;
+        continue;
+      } else if (result == '비겼습니다.') {
+        playerList[i].draw += 1;
+        continue;
+      } else {
+        playerList[i].lose += 1;
+      }
+    }
+  }
+
   void showCurrentStatus(BuildContext context) {
     showDialog(
       context: context,
@@ -189,10 +225,7 @@ class _myhomeState extends State<myhome> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('${playerList[0].getName()}: ${playerList[0].getWin()}승 ${playerList[0].getWin()}패 ${playerList[0].getWin()}무'),
-                Text('${playerList[1].getName()}: ${playerList[1].getWin()}승 ${playerList[1].getWin()}패 ${playerList[1].getWin()}무'),
-                Text('${playerList[2].getName()}: ${playerList[2].getWin()}승 ${playerList[2].getWin()}패 ${playerList[2].getWin()}무'),
-                Text('${playerList[3].getName()}: ${playerList[3].getWin()}승 ${playerList[3].getWin()}패 ${playerList[3].getWin()}무'),
+                Text(winStatusText(gameCount))
               ],
             ),
           ),
@@ -257,7 +290,6 @@ class _myhomeState extends State<myhome> {
                     onChanged: (value) {
                       setState(() {
                         playerList[0].score[gameCount] = int.parse(value!);
-                        print(playerList[0].score[gameCount]);
                       });
                     },
                   ),
@@ -351,11 +383,10 @@ class _myhomeState extends State<myhome> {
                     () {
                       if (gameCount != 18) {
                         gameCount++;
-                        print(playerList[0].team);
-                        print(playerList[0].score);
                       } else {
                         return;
                       }
+                      winStatus(gameCount);
                     },
                   );
                 },
