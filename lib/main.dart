@@ -25,7 +25,7 @@ class myhome extends StatefulWidget {
 }
 
 class _myhomeState extends State<myhome> {
-  final List<String> dropDownList = ['-4','-3','-2','-1','0', '1', '2', '3', '4'];
+  final List<String> dropDownList = ['0','1','2','3','4', '5', '6', '7', '8'];
   int gameCount = 0;
   List<Player> playerList = [
     Player('홍길동'),
@@ -87,6 +87,11 @@ class _myhomeState extends State<myhome> {
     if(teamCount[teamNumber - 1] == 3){ // 팀이 3명일 때
       teamScore.sort();
       sum = teamScore[0] + teamScore[1];
+      for(int i = 0; i<4; i++){
+        if(teamNumber != playerList[i].team[index]){
+          sum = teamScore[0]*2;
+        }
+      }
     }
 
     return sum;
@@ -342,7 +347,6 @@ class _myhomeState extends State<myhome> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  randomTeam();
                   setState(
                     () {
                       if (gameCount != 18) {
