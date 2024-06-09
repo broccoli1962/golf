@@ -33,20 +33,67 @@ class _myhomeState extends State<myhome> {
     Player('동해물'),
     Player('백두산')
   ];
+  List<int> teamCount = [0, 0, 0, 0];
+
+  countTeamMember(int index){
+    teamCount = [0, 0, 0, 0];
+    for(int i = 0; i < 4; i++){
+      teamCount[playerList[i].team[index] - 1] += 1;
+    }
+  }
 
   int calcTeamScore(int teamNumber, int index) {
     int sum = 0;
+    int count = 0;
+    List<int> teamScore = [];
+
     for (int i = 0; i < 4; i++) {
       //한팀에 2명 이상일때
       if (teamNumber == playerList[i].team[index]) {
+        teamScore.add(playerList[i].score[index]);
         sum += playerList[i].score[index];
       }
     }
+
+    if(teamCount[teamNumber - 1] == 1){ // 팀이 한명일 때
+      for(int i = 0; i < 4; i++){
+        if(i == (teamNumber - 1)){
+          continue;
+        }
+        if(teamCount[i] == 1){
+          count += 1;
+          sum += playerList[i].score[index];  // 한쪽에 점수 몰아주기
+          print('$i $index $sum');
+        }
+        if(count > 2){
+          return 0; // 1:1:1:1 인 경우 모든 팀 점수를 0으로 하고 개인 점수를 비교
+        }
+      }
+      if(count == 0){
+        sum *= 2;
+      }
+
+      for(int i = 0; i < 4; i++){
+        if(i == (teamNumber - 1)){
+          continue;
+        }
+        if(teamCount[i] == 1){
+          if(i < (teamNumber - 1)){
+            return 0; // 2:1:1일 경우 1명인 팀 2개 중 하나로 몰아주기 위해 한쪽 점수를 0으로 함.
+          }
+        }
+      }
+    }
+    if(teamCount[teamNumber - 1] == 3){ // 팀이 3명일 때
+      teamScore.sort();
+      sum = teamScore[0] + teamScore[1];
+    }
+
     return sum;
   }
 
 
-  String winningTeam(int one, int two, int three, int four){
+  String winningTeam(int one, int two, int three, int four, int index){
     // 각 팀의 타수로 이긴 팀 찾기
     Map scores =
     {
@@ -55,8 +102,38 @@ class _myhomeState extends State<myhome> {
       'team3':three,
       'team4':four
     };
+    int singleTeamCheck = 0;
     int count = 0;
     int min = 11; // 5홀에서 더블파로 10타가 최소 타수입니다.
+    String winningPlayer = '';  // 개인전의 승자
+
+    for(int i = 0; i < 4; i++){ // 하나의 팀만 점수가 있을 때 또는 모든 팀에 점수가 없을 때(4:0 or 1:1:1:1)
+      if(scores['team$i'] == 0){
+        singleTeamCheck++;
+      }
+    }
+
+    if(singleTeamCheck == 3){
+      for(int i = 0; i < 4; i++){
+        if(min > playerList[i].score[index]){
+          min = playerList[i].score[index];
+          winningPlayer = '${playerList[i].name} 승리';
+        }
+      }
+
+      for(int i = 0; i < 4; i++){
+        if(min == playerList[i].score[index]){
+          count++;
+        }
+      }
+
+      if(count > 1){
+        winningPlayer = '비겼습니다.';
+      }
+
+      return winningPlayer;
+    }
+
     String winningTeam = '';
 
     for(int i = 0; i < 4; i++){
@@ -86,12 +163,13 @@ class _myhomeState extends State<myhome> {
 
   String gameResultText(int index) {
     var result = '';
+    countTeamMember(index);
     for (int i = 0; i < 4; i++) {
       result +=
           '${playerList[i].getName()} : ${playerList[i].score[index]}  팀${i+1}: ${calcTeamScore(i+1, index)}\n';
     }
     result += '팀 분류: ${playerList[0].getName()} : 팀${playerList[0].team[index]} ${playerList[1].getName()}: 팀${playerList[1].team[index]} ${playerList[2].getName()}: 팀${playerList[2].team[index]} ${playerList[3].getName()}: 팀${playerList[3].team[index]}\n';
-    result += '결과 : 모름\n';
+    result += '결과 : ${winningTeam(calcTeamScore(1, index), calcTeamScore(2, index), calcTeamScore(3, index), calcTeamScore(4, index), index)}\n';
     return result;
   }
 
