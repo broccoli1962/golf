@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:golf/util.dart';
+import 'util.dart';
 
 class MyHome extends StatefulWidget {
   const MyHome({super.key});
