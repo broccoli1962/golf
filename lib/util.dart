@@ -1,10 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:golf/playpage.dart';
+import 'calculate.dart';
+import 'playpage.dart';
 import 'player.dart';
 
 int gameCount = 0;
+int lastGameCount = 0;
 
+//팀원의 리스트
 List<Player> playerList = [
   Player('홍길동'),
   Player('일지매'),
@@ -12,193 +15,113 @@ List<Player> playerList = [
   Player('백두산'),
 ];
 
-List<int> teamCount = [0, 0, 0, 0];
+TeamCalculate tc = Nothing();
+List<String> result = [];
 
-countTeamMember(int index){
-  teamCount = [0, 0, 0, 0];
-  for(int i = 0; i < 4; i++){
-    teamCount[playerList[i].team[index] - 1] += 1;
-  }
+//팀 분류별 점수 계산 클래스 인터페이스 선택
+void calc(){
+  for(int i = 0; i<4; i++){
+    int pt = playerList[i].team;
+    List<Player> same = [];
+    for(int j = 0; j<4; j++){
+      if(pt==playerList[j].team){
+        same.add(playerList[j]);
+      }
+    }
+    switch(same.length){
+      case 4: //4:0
+        tc = Gain(playerList[0], playerList[1], playerList[2], playerList[3], true);
+        return;
+      case 3: //3:1
+        tc = ThreeOne(playerList[0], playerList[1], playerList[2], playerList[3]);
+        return;
+      case 2: //2:2 or 2:1:1
+        tc = TwoTwo(playerList[0], playerList[1], playerList[2], playerList[3], i, playerList.indexOf(same[1]));
+        return;
+      default:
+    }
+  } //1:1:1:1
+  tc = Gain(playerList[0], playerList[1], playerList[2], playerList[3], false);
 }
 
-int calcTeamScore(int teamNumber, int index) {
-  int sum = 0;
-  int count = 0;
-  List<int> teamScore = [];
-
-  for (int i = 0; i < 4; i++) {
-    //한팀에 2명 이상일때
-    if (teamNumber == playerList[i].team[index]) {
-      teamScore.add(playerList[i].score[index]);
-      sum += playerList[i].score[index];
-    }
-  }
-
-  if(teamCount[teamNumber - 1] == 1){ // 팀이 한명일 때
-    for(int i = 0; i < 4; i++){
-      if(i == (teamNumber - 1)){
-        continue;
-      }
-      if(teamCount[i] == 1){
-        count += 1;
-        sum += playerList[i].score[index];  // 한쪽에 점수 몰아주기
-        print('$i $index $sum');
-      }
-      if(count > 2){
-        return 0; // 1:1:1:1 인 경우 모든 팀 점수를 0으로 하고 개인 점수를 비교
-      }
-    }
-    if(count == 0){
-      sum *= 2;
-    }
-
-    for(int i = 0; i < 4; i++){
-      if(i == (teamNumber - 1)){
-        continue;
-      }
-      if(teamCount[i] == 1){
-        if(i < (teamNumber - 1)){
-          return 0; // 2:1:1일 경우 1명인 팀 2개 중 하나로 몰아주기 위해 한쪽 점수를 0으로 함.
-        }
+//팀의 스코어 받기
+int calcTeamScore(int team){
+  for(int i = 0; i<4; i++){
+    if(team==playerList[i].team){
+      if(tc is ThreeOne || tc is TwoTwo){
+        return playerList[i].teamScore;
+      }else{
+        return playerList[i].score;
       }
     }
   }
-  if(teamCount[teamNumber - 1] == 3){ // 팀이 3명일 때
-    teamScore.sort();
-    sum = teamScore[0] + teamScore[1];
-  }
-
-  return sum;
+  return 0;
 }
 
-
-String winningTeam(int one, int two, int three, int four, int index){
-  // 각 팀의 타수로 이긴 팀 찾기
-  Map scores =
-  {
-    'team1':one,
-    'team2':two,
-    'team3':three,
-    'team4':four
-  };
-  int singleTeamCheck = 0;
-  int count = 0;
-  int min = 11; // 5홀에서 더블파로 10타가 최소 타수입니다.
-  String winningPlayer = '';  // 개인전의 승자
-
-  for(int i = 0; i < 4; i++){ // 하나의 팀만 점수가 있을 때 또는 모든 팀에 점수가 없을 때(4:0 or 1:1:1:1)
-    if(scores['team$i'] == 0){
-      singleTeamCheck++;
-    }
-  }
-
-  if(singleTeamCheck == 3){
-    for(int i = 0; i < 4; i++){
-      if(min > playerList[i].score[index]){
-        min = playerList[i].score[index];
-        winningPlayer = '${playerList[i].name} 승리';
-      }
-    }
-
-    for(int i = 0; i < 4; i++){
-      if(min == playerList[i].score[index]){
-        count++;
-      }
-    }
-
-    if(count > 1){
-      winningPlayer = '비겼습니다.';
-    }
-
-    return winningPlayer;
-  }
-
-  String winningTeam = '';
-
-  for(int i = 0; i < 4; i++){
-    // 0타는 팀 분류시 플레이어가 1명도 들어가지 않은 팀입니다.
-    if(scores['team${i + 1}'] == 0){
-      continue; // 스킵
-    }
-
-    if(min > scores['team${i + 1}']){
-      min = scores['team${i + 1}'];
-      winningTeam = '팀${i == 0 ? '1' : i == 1 ? '2' : i == 2 ? '3' : '4'} 승리';
-    }
-  }
-
-  for(int i = 0; i < 4; i++){
-    if(min == scores['team${i + 1}']){
-      count++;
-    }
-  }
-
-  if(count > 1){
-    winningTeam = '비겼습니다.';
-  }
-
-  return winningTeam;
-}
-
+//게임 결과 리스트 출력
+//as == 캐스팅 is == instance of
 String gameResultText(int index) {
-  var result = '';
-  countTeamMember(index);
-  for (int i = 0; i < 4; i++) {
-    result +=
-    '${playerList[i].getName()} : ${playerList[i].score[index]}  팀${i+1}: ${calcTeamScore(i+1, index)}\n';
+  if(result.length>index){
+    return result[index];
   }
-  result += '팀 분류: ${playerList[0].getName()} : 팀${playerList[0].team[index]} ${playerList[1].getName()}: 팀${playerList[1].team[index]} ${playerList[2].getName()}: 팀${playerList[2].team[index]} ${playerList[3].getName()}: 팀${playerList[3].team[index]}\n';
-  result += '결과 : ${winningTeam(calcTeamScore(1, index), calcTeamScore(2, index), calcTeamScore(3, index), calcTeamScore(4, index), index)}\n';
-  return result;
+
+  int winTeam = tc.insert();
+
+  var text = '';
+
+  for(int i=0; i<4; i++){ //플레이어 이름 점수, 팀의 점수 출력
+    text += '${playerList[i].getName()} : ${playerList[i].getScore()} 팀${i+1}: ${calcTeamScore(i+1)}\n';
+  }
+  text += '팀 분류: ';
+  for(int i=0; i<4; i++){ //내가 무슨 팀인지
+    text += '${playerList[i].getName()} : 팀${playerList[i].getTeam()} ';
+  }
+
+  text += '\n결과 : ';
+  if(winTeam == -1){
+    text+='비겼습니다.';
+  }else if(tc is Gain){
+    bool dupe = (tc as Gain).dupe;
+    List<Player> temp = tc.winTeam();
+    for(int i = 0; i<temp.length; i++){
+      if(dupe){
+        text+='${temp[i].getName()}, ';
+      }else{
+        text+='팀${temp[i].team}, ';
+      }
+    }
+    text = text.substring(0, text.length-2);
+    text += ' 승리';
+  }else if(tc is ThreeOne){
+    text+='팀$winTeam 승리';
+  }else{
+    List<Player> win = tc.winTeam();
+    if(win[0].team==win[1].team) {
+      text += '팀$winTeam 승리';
+    }else{
+      text += '팀${win[0].team}, 팀${win[1].team} 승리';
+    }
+  }
+  result.add(text);
+  return text;
 }
 
+//현황 화면 출력
 String winStatusText(int index){
   var result = '';
   for(int i = 0; i<4; i++) {
     result += '${playerList[i].getName()} : ${playerList[i].getWin()}승 ${playerList[i].getLose()}패 ${playerList[i].getDraw()}무\n';
   }
-
   return result;
 }
 
-void winStatus(int index) {
-  countTeamMember(index-1);
-  String result = winningTeam(
-      calcTeamScore(1, index - 1), calcTeamScore(2, index - 1),
-      calcTeamScore(3, index - 1), calcTeamScore(4, index - 1), index - 1);
-
-  print(result);
-  print('인덱스 $index');
-  print(playerList[0].getTeam(index - 1));
-
-  for (int i = 0; i < 4; i++) {
-    if (result == '팀1 승리' && playerList[i].getTeam(index - 1) == 1) {
-      playerList[i].win += 1;
-      continue;
-    } else if (result == '팀2 승리' && playerList[i].getTeam(index - 1) == 2) {
-      playerList[i].win += 1;
-      continue;
-    } else if (result == '팀3 승리' && playerList[i].getTeam(index - 1) == 3) {
-      playerList[i].win += 1;
-      continue;
-    } else if (result == '팀4 승리' && playerList[i].getTeam(index - 1) == 4) {
-      playerList[i].win += 1;
-      continue;
-    } else if (result == '비겼습니다.') {
-      playerList[i].draw += 1;
-      continue;
-    } else {
-      playerList[i].lose += 1;
-    }
-  }
-}
-
+//현황 버튼 출력
 void showCurrentStatus(BuildContext context) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('현황'),
+        title: const Text('현황'),
         content: SizedBox(
           width: MediaQuery.of(context).size.width,
           child: Column(
@@ -214,7 +137,7 @@ void showCurrentStatus(BuildContext context) {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('ok'),
+            child: const Text('ok'),
           ),
         ],
       );
@@ -222,12 +145,13 @@ void showCurrentStatus(BuildContext context) {
   );
 }
 
+//18경기 종료후 화면 출력
 void endCurrentStatus(BuildContext context) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('경기 종료'),
+        title: const Text('경기 종료'),
         content: SizedBox(
           width: MediaQuery.of(context).size.width,
           child: Column(
@@ -242,14 +166,16 @@ void endCurrentStatus(BuildContext context) {
           OutlinedButton(
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const myhome()),
+                  MaterialPageRoute(builder: (context) => const MyHome()),
                       (route) => false);
               for(int i = 0; i<playerList.length; i++){
                 playerList[i].reset();
               }
+              result = [];
               gameCount=0;
+              lastGameCount=0;
             },
-            child: Text('초기화'),
+            child: const Text('초기화'),
           ),
         ],
       );
@@ -258,18 +184,24 @@ void endCurrentStatus(BuildContext context) {
 }
 
 
+//팀 랜덤화
 void randomTeam(){
   for (int i = 0; i < 4; i++){
     int teamNumber = Random().nextInt(4)+1;
-    playerList[i].team[gameCount] = teamNumber;
+    playerList[i].team = teamNumber;
   }
+  calc();
 }
 
-int first = -1;
+//현재 팀 출력
 String resultTitle() {
-  if (first != gameCount) {
+  if(gameCount!=0 && lastGameCount<gameCount){
+    gameResultText(gameCount-1); //미리 출력 결과 계산
     randomTeam();
-    first = gameCount;
+    lastGameCount = gameCount;
   }
-  return '${playerList[0].getName()} : 팀${playerList[0].getTeam(gameCount)}, ${playerList[1].getName()} : 팀${playerList[1].getTeam(gameCount)}, ${playerList[2].getName()} : 팀${playerList[2].getTeam(gameCount)}, ${playerList[3].getName()} : 팀${playerList[3].getTeam(gameCount)}';
+  return '${playerList[0].getName()} : 팀${playerList[0].getTeam()},'
+      ' ${playerList[1].getName()} : 팀${playerList[1].getTeam()},'
+      ' ${playerList[2].getName()} : 팀${playerList[2].getTeam()},'
+      ' ${playerList[3].getName()} : 팀${playerList[3].getTeam()}';
 }

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:golf/playpage.dart';
-import 'package:golf/registerpage.dart';
+import 'registerpage.dart';
 
-void main() => runApp(const myApp());
+void main() => runApp(const MyApp());
 
-class myApp extends StatelessWidget {
-  const myApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Golf',
-      home: register(),
+      home: Register(),
     );
   }
 }
