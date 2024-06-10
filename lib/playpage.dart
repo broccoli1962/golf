@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:golf/util.dart';
 
-class myhome extends StatefulWidget {
-  const myhome({super.key});
+class MyHome extends StatefulWidget {
+  const MyHome({super.key});
 
   @override
-  State<myhome> createState() => _myhomeState();
+  State<MyHome> createState() => _MyHomeState();
 }
 
-class _myhomeState extends State<myhome> {
-  final List<String> dropDownList = ['0','1','2','3','4', '5', '6', '7', '8'];
+class _MyHomeState extends State<MyHome> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    randomTeam();
+  }
 
+  final List<String> dropDownList = [
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +46,9 @@ class _myhomeState extends State<myhome> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   DropdownButton<String>(
-                    value: playerList[0].score[gameCount].toString(),
+                    value: playerList[0].score.toString(),
                     items: dropDownList.map(
-                          (value) {
+                      (value) {
                         return DropdownMenuItem(
                           value: value,
                           child: Text(value),
@@ -41,14 +57,14 @@ class _myhomeState extends State<myhome> {
                     ).toList(),
                     onChanged: (value) {
                       setState(() {
-                        playerList[0].score[gameCount] = int.parse(value!);
+                        playerList[0].score = int.parse(value!);
                       });
                     },
                   ),
                   DropdownButton<String>(
-                    value: playerList[1].score[gameCount].toString(),
+                    value: playerList[1].score.toString(),
                     items: dropDownList.map(
-                          (value) {
+                      (value) {
                         return DropdownMenuItem(
                           value: value,
                           child: Text(value),
@@ -57,14 +73,14 @@ class _myhomeState extends State<myhome> {
                     ).toList(),
                     onChanged: (value) {
                       setState(() {
-                        playerList[1].score[gameCount] = int.parse(value!);
+                        playerList[1].score = int.parse(value!);
                       });
                     },
                   ),
                   DropdownButton<String>(
-                    value: playerList[2].score[gameCount].toString(),
+                    value: playerList[2].score.toString(),
                     items: dropDownList.map(
-                          (value) {
+                      (value) {
                         return DropdownMenuItem(
                           value: value,
                           child: Text(value),
@@ -73,14 +89,14 @@ class _myhomeState extends State<myhome> {
                     ).toList(),
                     onChanged: (value) {
                       setState(() {
-                        playerList[2].score[gameCount] = int.parse(value!);
+                        playerList[2].score = int.parse(value!);
                       });
                     },
                   ),
                   DropdownButton<String>(
-                    value: playerList[3].score[gameCount].toString(),
+                    value: playerList[3].score.toString(),
                     items: dropDownList.map(
-                          (value) {
+                      (value) {
                         return DropdownMenuItem(
                           value: value,
                           child: Text(value),
@@ -89,7 +105,7 @@ class _myhomeState extends State<myhome> {
                     ).toList(),
                     onChanged: (value) {
                       setState(() {
-                        playerList[3].score[gameCount] = int.parse(value!);
+                        playerList[3].score = int.parse(value!);
                       });
                     },
                   ),
@@ -109,7 +125,7 @@ class _myhomeState extends State<myhome> {
               height: 2,
               thickness: 1,
             ),
-            Container(
+            SizedBox(
               width: double.infinity,
               height: 500,
               child: ListView.separated(
@@ -132,18 +148,17 @@ class _myhomeState extends State<myhome> {
             ElevatedButton(
                 onPressed: () {
                   setState(
-                        () {
+                    () {
                       if (gameCount < 18) {
                         gameCount++;
                       } else {
                         endCurrentStatus(context);
                         return;
                       }
-                      winStatus(gameCount);
                     },
                   );
                 },
-                child: Text('입력')),
+                child: const Text('입력')),
           ],
         ),
       ),
@@ -151,7 +166,7 @@ class _myhomeState extends State<myhome> {
         onPressed: () {
           showCurrentStatus(context);
         },
-        child: Text('현황'),
+        child: const Text('현황'),
       ),
     );
   }

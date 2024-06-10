@@ -1,30 +1,32 @@
 class Player {
   String name = "";
 
-  List<int> score = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0];
-  List<int> team = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0];
+  int teamScore = 0;
+  int score = 0;
+  int team = 0;
   int win = 0;
   int lose = 0;
   int draw = 0;
 
-  void reset(){
-    this.score = List.filled(19, 0);
-    this.team = List.filled(19, 0);
-    this.win = 0;
-    this.lose = 0;
-    this.draw = 0;
+  void reset() {
+    teamScore = 0;
+    score = 0;
+    team = 0;
+    win = 0;
+    lose = 0;
+    draw = 0;
   }
 
   String getName() {
     return name;
   }
 
-  int getTeam(num) {
-    return team[num];
+  int getTeam() {
+    return team;
   }
 
-  int getScore(num) {
-    return score[num];
+  int getScore() {
+    return score;
   }
 
   int getWin() {
