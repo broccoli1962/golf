@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'registerpage.dart';
+import 'introduce.dart';
 
 void main() => runApp(const MyApp());
 
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Golf',
-      home: Register(),
+      home: Introduce(),
     );
   }
 }

@@ -8,11 +8,13 @@ class MyHome extends StatefulWidget {
   State<MyHome> createState() => _MyHomeState();
 }
 
+
 class _MyHomeState extends State<MyHome> {
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    register();
     randomTeam();
   }
 
