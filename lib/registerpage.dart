@@ -9,7 +9,9 @@ class Register extends StatefulWidget {
   State<Register> createState() => _RegisterState();
 }
 
-List<Player> regi = [];
+List<Player> regi = [
+  // Player('dummy', 'code'),
+];
 
 class _RegisterState extends State<Register> {
   final TextEditingController _controller = TextEditingController();

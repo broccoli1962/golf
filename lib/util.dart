@@ -12,12 +12,18 @@ int lastGameCount = 0;
 //회원가입
 void register(){
   for(int i = 0; i<4; i++){
-    for(int j = 0; j<regi.length; j++){
-      if(regi[j].code==p[i]){
-        playerList.add(Player(regi[j].name, regi[j].code));
-      }else{
-        playerList.add(Player(p[i], ''));
+    bool find = false;
+    if(regi.isNotEmpty){
+      for(int j = 0; j<regi.length; j++){
+        if(regi[j].code==p[i]){
+          playerList.add(Player(regi[j].name, regi[j].code));
+          find = true;
+          break;
+        }
       }
+    }
+    if(!find){
+      playerList.add(Player(p[i], ''));
     }
   }
 }

@@ -30,15 +30,39 @@ class _InputNameState extends State<InputName> {
                 children: [
                   TextField(
                     controller: p1,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      labelText: '플레이어1',
+                    ),
                   ),
                   TextField(
                     controller: p2,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      labelText: '플레이어2',
+                    ),
                   ),
                   TextField(
                     controller: p3,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      labelText: '플레이어3',
+                    ),
                   ),
                   TextField(
                     controller: p4,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      labelText: '플레이어4',
+                    ),
                   ),
                 ],
               )),
