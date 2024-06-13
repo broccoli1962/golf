@@ -3,17 +3,27 @@ import 'package:flutter/material.dart';
 import 'calculate.dart';
 import 'playpage.dart';
 import 'player.dart';
+import 'inputname.dart';
+import 'registerpage.dart';
 
 int gameCount = 0;
 int lastGameCount = 0;
 
+//회원가입
+void register(){
+  for(int i = 0; i<4; i++){
+    for(int j = 0; j<regi.length; j++){
+      if(regi[j].code==p[i]){
+        playerList.add(Player(regi[j].name, regi[j].code));
+      }else{
+        playerList.add(Player(p[i], ''));
+      }
+    }
+  }
+}
+
 //팀원의 리스트
-List<Player> playerList = [
-  Player('홍길동'),
-  Player('일지매'),
-  Player('동해물'),
-  Player('백두산'),
-];
+List<Player> playerList = [];
 
 TeamCalculate tc = Nothing();
 List<String> result = [];

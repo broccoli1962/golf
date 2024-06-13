@@ -1,5 +1,6 @@
 class Player {
   String name = "";
+  String code = "";
 
   int teamScore = 0;
   int score = 0;
@@ -41,5 +42,5 @@ class Player {
     return draw;
   }
 
-  Player(this.name);
+  Player(this.name, this.code);
 }
