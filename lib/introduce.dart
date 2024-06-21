@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:golf/inputname.dart';
+import 'inputname.dart';
 import 'registerpage.dart';
 
 class Introduce extends StatefulWidget {

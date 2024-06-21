@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:golf/introduce.dart';
+import 'introduce.dart';
 import 'player.dart';
 
 class Register extends StatefulWidget {

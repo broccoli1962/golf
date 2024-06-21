@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:golf/playpage.dart';
+import 'playpage.dart';
 
 class InputName extends StatefulWidget {
   const InputName({super.key});
